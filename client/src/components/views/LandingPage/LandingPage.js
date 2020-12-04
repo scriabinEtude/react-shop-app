@@ -5,7 +5,10 @@ import { Col, Card, Row } from 'antd'
 import Meta from 'antd/lib/card/Meta';
 import ImageSlider from '../../utils/ImageSlider'
 import Checkbox from './Section/CheckBox'
-import {continents} from './Section/Datas'
+import RadioBox from './Section/RadioBox'
+import SearchFeature from './Section/SearchFeature'
+import {continents, price} from './Section/Datas'
+import Search from 'antd/lib/input/Search';
 
 function LandingPage() {
 
@@ -13,6 +16,13 @@ function LandingPage() {
     const [Skip, setSkip] = useState(0)
     const [Limit, setLimit] = useState(8)
     const [PostSize, setPostSize] = useState(0)
+
+    const [Filters, setFilters] = useState({
+        continents: [],
+        price: []
+    })
+
+    const [SearchTerm, setSearchTerm] = useState("")
 
     useEffect(() => {
 
@@ -28,7 +38,7 @@ function LandingPage() {
     const renderCards = Product.map((product, index) => {
         return  <Col lg={6} md={8} xs={24} key={index}>
                     <Card
-                        cover={<ImageSlider images={product.images} />}
+                        cover={<a href={`/product/${product._id}`}><ImageSlider images={product.images} /></a>}
                     >
                         <Meta 
                             title={product.title}
@@ -36,9 +46,44 @@ function LandingPage() {
                         />
                     </Card>
                 </Col>
-        
-        
     })
+
+    const showFilteredResults = (filters) => {
+        let body = {
+            skip:0,
+            limit:Limit,
+            filters:filters
+        }
+
+        getProducts(body)
+        setSkip(0)
+    }
+
+    const handlePrice = (value) => {
+        const data = price
+        let array = []
+
+        for (let key in data) {
+            if(data[key]._id === parseInt(value, 10)){
+                array = data[key].array
+            }
+        }
+
+        return array
+    }
+
+    const handleFilters = (filters, category) => {
+        const newFilters = {...Filters}
+        newFilters[category] = filters
+
+        if(category === "price"){
+            let priceValue = handlePrice(filters)
+            newFilters[category] = priceValue
+        }
+
+        showFilteredResults(newFilters)
+        setFilters(newFilters)
+    }
 
     const getProducts = (body) => {
         axios.post('api/product/products', body)
@@ -69,6 +114,20 @@ function LandingPage() {
         setSkip(skip)
     }
 
+    const updateSearchTerm = (newSearchTerm) => {
+
+        let body = {
+            skip : 0,
+            limit : Limit,
+            filters:Filters,
+            searchTerm:newSearchTerm
+        }
+
+        setSkip(0)
+        setSearchTerm(newSearchTerm)
+        getProducts(body)
+    }
+
     return (
         <div style={{width:'75%', margin:'3rem auto'}}>
             <div style={{textAlign:'center'}}>
@@ -76,13 +135,21 @@ function LandingPage() {
             </div>
 
             {/* Filter*/}
-
-            {/* CheckBox */}
-            <Checkbox list={continents}/>
-
-            {/* RadioBox */}
+            <Row gutter={[16, 16]}>
+                <Col lg={12} xs={24} >
+                    <Checkbox list={continents} handleFilters={filters => handleFilters(filters, "continents")} />    
+                </Col>
+                <Col lg={12} xs={24} >
+                    <RadioBox list={price} handleFilters={filters => handleFilters(filters, "price")} />
+                </Col>
+            </Row> 
 
             {/* Search */}
+            <div style={{display:'flex', justifyContent:'flex-end', margin:'1rem auto'}}>
+                <SearchFeature 
+                    refreshFunction={updateSearchTerm}
+                />
+            </div>
 
             {/* Cards */}
 
