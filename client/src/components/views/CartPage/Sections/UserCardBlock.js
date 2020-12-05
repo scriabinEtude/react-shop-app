@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import "./UserCardBlock.css"
 import {Button} from 'antd'
 
@@ -25,7 +25,7 @@ function UserCardBlock(props) {
                     {product.price}
                 </td>
                 <td>
-                    <Button>
+                    <Button onClick={()=>props.removeItem(product._id)}>
                         Remove
                     </Button>
                 </td>
