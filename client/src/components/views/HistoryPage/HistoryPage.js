@@ -34,6 +34,6 @@ function HistoryPage(props) {
             
         </div>
     )
-}
+} 
 
 export default HistoryPage
