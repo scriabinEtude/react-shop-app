@@ -8,7 +8,6 @@ import Checkbox from './Section/CheckBox'
 import RadioBox from './Section/RadioBox'
 import SearchFeature from './Section/SearchFeature'
 import {continents, price} from './Section/Datas'
-import Search from 'antd/lib/input/Search';
 
 function LandingPage() {
 
